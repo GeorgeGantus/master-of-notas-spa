@@ -1,9 +1,14 @@
 <template>
     <div class="page">
         <div class="page-container"> 
-        <form class="login__box">
+        <form class="login__box" @submit.prevent="sign">
             <img style="max-width:100%" src="../../assets/logo.png"/>
             <v-text-field label="E-mail" v-model="user.email" type="email" :rules="rules">
+                <v-icon slot="prepend" color="grey" >
+                  @
+                </v-icon>
+            </v-text-field>
+            <v-text-field label="Username" v-model="user.username" :rules="rules">
                 <v-icon slot="prepend" color="grey" >
                   @
                 </v-icon>
@@ -13,15 +18,20 @@
                   mdi-key
                 </v-icon>
             </v-text-field>
+            <v-text-field v-if="!isSignIn" :rules="rules" label="Confirmar Senha" v-model="user.confirmPassword" type="password">
+                <v-icon slot="prepend" color="grey" >
+                  mdi-key
+                </v-icon>
+            </v-text-field>
+            <p v-if="error" class="login__error">Erro ao {{actionText}},tente novamente</p>
             <v-btn block depressed color="#00C853" class="white--text" type="submit">
-                Entrar
+                {{actionText}}
             </v-btn>
-
-            <p class="login__forgot-password">Esqueceu sua senha? <span>Clique aqui</span></p>
+            <p v-if="isSignIn" class="login__forgot-password">Esqueceu sua senha? <span>Clique aqui</span></p>
         </form>
         <div class="signUp__box">
-            <v-btn block depressed color="#1976D2" class="white--text" @click="navigate('signup')">
-                Cadastrar-se
+            <v-btn block depressed color="#1976D2" class="white--text" @click="isSignIn = !isSignIn">
+                {{changeActionText}}
             </v-btn>
         </div>
         </div>
@@ -29,22 +39,44 @@
 </template>
 
 <script>
+import { mapActions } from 'vuex'
     export default {
         data() {
             return {
                 user: {
                     email: '',
+                    username: '',
                     password: '',
+                    confirmPassword: '',
                 },
                 rules: [
                     value => !!value || 'Obrigatório',
                     value => (value && value.length >= 6) || 'Mínimo de 3 caracteres',
                 ],
+                isSignIn: true,
+                error: ''
+            }
+        },
+        computed:{
+            actionText(){
+                return this.isSignIn ? 'Entrar' : 'Cadastrar-se'
+            },
+            changeActionText(){
+                return this.isSignIn ? 'Cadastrar-se' : 'Entrar'
             }
         },
         methods: {
+            ...mapActions(['loginRequest','signUpRequest']),
             navigate(to) {
                 this.$router.push({name:to})
+            },
+            sign(){
+                try {
+                    this.isSignIn ? this.loginRequest(this.user) : this.signUpRequest(this.user) 
+                } catch (error) {
+                    console.log('iahyy')
+                    this.error = `Erro ao ${this.actionText}`
+                }
             }
         },
     }
@@ -84,6 +116,9 @@
 }
 .login__forgot-password span:hover{
     text-decoration: underline;
+}
+.login__error{
+    color: red;
 }
 .signUp__box{
     margin-top: 40px;
