@@ -12,13 +12,17 @@
     </header>
     <div class="content">
         <div class="content__sidebar" :class="{'is-expanded': isMenuExpanded}"> Side Bar</div>
-        <div>Content</div>
+        <div>{{user.username}}</div>
+        <br>
+        <div>{{user.tipoUsuario}}</div>
+
     </div>
     <footer>dasdsa</footer>
   </div>
 </template>
 
 <script>
+import { mapState } from 'vuex'
   export default {
     data: () => ({ 
         drawer: null ,
@@ -26,6 +30,9 @@
         
         
     }),
+    computed:{
+        ...mapState(['user'])
+    },
     methods: {
         toggleMenu() {
             this.isMenuExpanded = !this.isMenuExpanded

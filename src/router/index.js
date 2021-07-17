@@ -7,7 +7,7 @@ Vue.use(VueRouter)
 
 const routes = [
   {
-    path: '/Login',
+    path: '/login',
     name: 'login',
     component: SignView
   },
